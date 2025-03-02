@@ -24,4 +24,3 @@ TerraSense, **iklim verilerini analiz ederek** tarımsal karar süreçlerine kat
 ### 🎯 Hedef Kitle
 
 🌾 **Tarımsal üretim yapan bireyler**  
-📊 **Veriye dayalı tarım kararları almak isteyen kullanıcılar**  
