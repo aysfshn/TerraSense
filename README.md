@@ -25,12 +25,3 @@ TerraSense, **iklim verilerini analiz ederek** tarımsal karar süreçlerine kat
 
 🌾 **Tarımsal üretim yapan bireyler**  
 📊 **Veriye dayalı tarım kararları almak isteyen kullanıcılar**  
-
----
-
-## ⚙️ Kullanılan Teknolojiler
-
-- **Flutter** - Mobil uygulama geliştirme  
-- **Python & Yapay Zeka API'leri** - Veri analizi ve model geliştirme  
-- **Cloud AI Services** - Bulut tabanlı veri işleme  
-- **PostgreSQL** - Veri tabanı yönetimi  
