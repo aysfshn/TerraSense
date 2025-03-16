@@ -1,0 +1,103 @@
+import 'package:flutter/material.dart';
+import '../models/land.dart';
+
+class TaskListScreen extends StatefulWidget {
+  final Land land;
+  final Function(Land) onUpdate;
+
+  const TaskListScreen({
+    Key? key,
+    required this.land,
+    required this.onUpdate,
+  }) : super(key: key);
+
+  @override
+  State<TaskListScreen> createState() => _TaskListScreenState();
+}
+
+class _TaskListScreenState extends State<TaskListScreen> {
+  late Land land;
+
+  @override
+  void initState() {
+    super.initState();
+    land = widget.land;
+  }
+
+  void _toggleTask(int index) {
+    setState(() {
+      land.tasks[index].isDone = !land.tasks[index].isDone;
+      // Görevi tamamladıysa bakım yüzdesini artırıyoruz (örnek)
+      if (land.tasks[index].isDone) {
+        land.carePercentage += 5; 
+      } else {
+        land.carePercentage -= 5; 
+      }
+    });
+    widget.onUpdate(land);
+  }
+
+  void _addTask(String taskName) {
+    setState(() {
+      land.tasks.add(TaskItem(taskName: taskName));
+    });
+    widget.onUpdate(land);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Görevler'),
+      ),
+      body: ListView.builder(
+        itemCount: land.tasks.length,
+        itemBuilder: (context, index) {
+          final task = land.tasks[index];
+          return CheckboxListTile(
+            title: Text(task.taskName),
+            value: task.isDone,
+            onChanged: (val) {
+              _toggleTask(index);
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          String? newTask = await _showAddTaskDialog();
+          if (newTask != null && newTask.isNotEmpty) {
+            _addTask(newTask);
+          }
+        },
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Future<String?> _showAddTaskDialog() async {
+    String taskName = '';
+    return showDialog<String>(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text('Yeni Görev Ekle'),
+          content: TextField(
+            onChanged: (val) => taskName = val,
+            decoration: const InputDecoration(hintText: 'Görev adı'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('İptal'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, taskName),
+              child: const Text('Ekle'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}

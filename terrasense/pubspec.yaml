@@ -1,0 +1,23 @@
+name: terra_sense
+description: Bir tarım danışmanlık ve takip uygulaması
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.19.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.5
+  # Bildirim, resim yükleme vs. için ek paketleri sonradan ekleyebilirsiniz.
+  # Örneğin local_notifications paketi, image_picker vb.
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  lint: ^2.0.0
+  image_picker: ^0.8.7+3
+
+flutter:
+  uses-material-design: true
