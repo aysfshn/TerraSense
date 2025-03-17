@@ -2,8 +2,10 @@ from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
-from models import db
-from routes import auth_bp, main_bp
+from .models import db
+from .routes.authRoutes import auth_bp
+from .routes.main import main_bp
+from .routes.araziRoutes import arazi_bp
 
 def create_app():
     # .env dosyasını yükle
@@ -26,6 +28,7 @@ def create_app():
     # Blueprint'leri kaydet
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(arazi_bp, url_prefix='/arazi')
 
     # Veritabanı tablolarını oluştur
     with app.app_context():
