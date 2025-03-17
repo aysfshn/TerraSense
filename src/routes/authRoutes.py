@@ -1,23 +1,12 @@
 from flask import Blueprint, jsonify, request
-from models import db, User
-from utils.auth import generate_token, token_required
+from src.models import db, User
+from src.utils.auth import generate_token, token_required
 import datetime
 from email_validator import validate_email, EmailNotValidError
 
 # Blueprint oluştur
 auth_bp = Blueprint('auth', __name__)
-main_bp = Blueprint('main', __name__)
 
-# Ana sayfa route'ları
-@main_bp.route('/')
-def ana_sayfa():
-    return jsonify({
-        'mesaj': 'TerraSense API\'sine Hoş Geldiniz',
-        'durum': 'çalışıyor',
-        'versiyon': '1.0.0'
-    })
-
-# Kimlik doğrulama route'ları
 @auth_bp.route('/kayit', methods=['POST'])
 def kayit():
     data = request.get_json()
@@ -90,4 +79,4 @@ def giris():
 @auth_bp.route('/profil', methods=['GET'])
 @token_required
 def profil(current_user):
-    return jsonify(current_user.to_dict()) 
+    return jsonify(current_user.to_dict())

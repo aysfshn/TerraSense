@@ -3,7 +3,7 @@ from functools import wraps
 from flask import request, jsonify
 from datetime import datetime, timedelta
 import os
-from models import User
+from src.models import User
 
 def generate_token(user_id):
     payload = {

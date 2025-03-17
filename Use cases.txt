@@ -1,0 +1,20 @@
+Use Case #1
+1. Kullanıcı sisteme kayıt olacak.
+2. Kullanıcı arsa ekleyecek.
+3. Kullanıcının sorduğu sorulara arsaya özel cevaplar verilecek.
+
+Use Case #2
+1. Kullanıcı sisteme giriş yapacak.
+2. Kullanıcı birden fazla arsa ekleyebilecek.
+3. Kullanıcı eklediği arsaları istediği şekilde sıralayabilecek.
+
+Use Case #3 
+1. Kullanıcı sisteme giriş yapacak.
+2. Kullanıcı mevcut arsalarını düzenleyebilecek.
+3. Kullanıcı istediği takdirde arsanın toprak analizi sonuçlarını arsanın özelliklerine girebilecek.
+4. Kullanıcı arsa üzerinde yaptığı değişiklileri kaydedebilecek.
+
+Use Case #4
+1. Kullanıcı sisteme giriş yapacak.
+2. Kullanıcı arsalarını silebilecek.
+3. Kullanıcı sildiği arsaları geri yükleyebilecek.
