@@ -1,11 +1,14 @@
 from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
+load_dotenv()
 import os
 from .models import db
 from .routes.authRoutes import auth_bp
 from .routes.main import main_bp
 from .routes.araziRoutes import arazi_bp
+
+secret = os.getenv("SECRET_KEY")
 
 def create_app():
     # .env dosyasını yükle
