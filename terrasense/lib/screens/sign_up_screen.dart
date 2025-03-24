@@ -19,7 +19,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<void> registerUser() async {
     final url = Uri.parse(
-        'http://127.0.0.1:5000/auth/kayit'); // Replace with your actual backend URL
+      'http://127.0.0.1:5000/auth/kayit',
+    ); // Replace with your actual backend URL
 
     try {
       final response = await http.post(
@@ -44,18 +45,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
         final responseData = json.decode(response.body);
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Hata'),
-            content: Text(responseData['hata'] ?? 'Kayıt işlemi başarısız'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('Tamam'),
+          builder:
+              (context) => AlertDialog(
+                title: Text('Hata'),
+                content: Text(responseData['hata'] ?? 'Kayıt işlemi başarısız'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Tamam'),
+                  ),
+                ],
               ),
-            ],
-          ),
         );
       }
     } catch (e) {
@@ -67,9 +69,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Üye Ol'),
-      ),
+      appBar: AppBar(title: const Text('Üye Ol')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(

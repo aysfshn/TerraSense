@@ -9,11 +9,8 @@ class LandDetailScreen extends StatefulWidget {
   final Land land;
   final Function(Land) onUpdate;
 
-  const LandDetailScreen({
-    Key? key,
-    required this.land,
-    required this.onUpdate,
-  }) : super(key: key);
+  const LandDetailScreen({Key? key, required this.land, required this.onUpdate})
+    : super(key: key);
 
   @override
   State<LandDetailScreen> createState() => _LandDetailScreenState();
@@ -41,9 +38,9 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
       });
       widget.onUpdate(updatedLand);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Güncelleme hatası: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Güncelleme hatası: $e')));
     } finally {
       setState(() {
         isUpdating = false;
@@ -54,21 +51,22 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
   void _selectCrop() async {
     final selected = await showDialog<String>(
       context: context,
-      builder: (_) => SimpleDialog(
-        title: const Text('Ürün Seçimi'),
-        children: [
-          ...land.recommendedCrops.map((crop) {
-            return SimpleDialogOption(
-              onPressed: () => Navigator.pop(context, crop),
-              child: Text(crop),
-            );
-          }).toList(),
-          SimpleDialogOption(
-            onPressed: () => Navigator.pop(context, 'manual'),
-            child: const Text('Listede yok, kendim gireyim.'),
-          )
-        ],
-      ),
+      builder:
+          (_) => SimpleDialog(
+            title: const Text('Ürün Seçimi'),
+            children: [
+              ...land.recommendedCrops.map((crop) {
+                return SimpleDialogOption(
+                  onPressed: () => Navigator.pop(context, crop),
+                  child: Text(crop),
+                );
+              }).toList(),
+              SimpleDialogOption(
+                onPressed: () => Navigator.pop(context, 'manual'),
+                child: const Text('Listede yok, kendim gireyim.'),
+              ),
+            ],
+          ),
     );
 
     if (selected == null) return;
@@ -150,50 +148,62 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
     final profit = land.totalIncome - land.totalExpense;
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Kâr Marjı'),
-        content: Text('Kâr Marjınız: $profit'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Kapat'),
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Kâr Marjı'),
+            content: Text('Kâr Marjınız: $profit'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Kapat'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
   // Ek alanları düzenleme diyalog fonksiyonu
   void _editAdditionalDetails() {
     // Existing controllers
-    final sizeController =
-        TextEditingController(text: land.size?.toString() ?? '');
-    final landStructureController =
-        TextEditingController(text: land.landStructure ?? '');
-    final soilColorController =
-        TextEditingController(text: land.soilColor ?? '');
-    final soilCompositionController =
-        TextEditingController(text: land.soilComposition ?? '');
-    final stoneStatusController =
-        TextEditingController(text: land.stoneStatus ?? '');
-    final waterStatusController =
-        TextEditingController(text: land.waterStatus ?? '');
-    final irrigationSourceController =
-        TextEditingController(text: land.irrigationSource ?? '');
-    final irrigationMethodController =
-        TextEditingController(text: land.irrigationMethod ?? '');
+    final sizeController = TextEditingController(
+      text: land.size?.toString() ?? '',
+    );
+    final landStructureController = TextEditingController(
+      text: land.landStructure ?? '',
+    );
+    final soilColorController = TextEditingController(
+      text: land.soilColor ?? '',
+    );
+    final soilCompositionController = TextEditingController(
+      text: land.soilComposition ?? '',
+    );
+    final stoneStatusController = TextEditingController(
+      text: land.stoneStatus ?? '',
+    );
+    final waterStatusController = TextEditingController(
+      text: land.waterStatus ?? '',
+    );
+    final irrigationSourceController = TextEditingController(
+      text: land.irrigationSource ?? '',
+    );
+    final irrigationMethodController = TextEditingController(
+      text: land.irrigationMethod ?? '',
+    );
 
     // New fields
-    final recentProductsController =
-        TextEditingController(text: land.recentProducts ?? '');
+    final recentProductsController = TextEditingController(
+      text: land.recentProducts ?? '',
+    );
     final issuesController = TextEditingController(text: land.issues ?? '');
-    final equipmentsController =
-        TextEditingController(text: land.equipments ?? '');
+    final equipmentsController = TextEditingController(
+      text: land.equipments ?? '',
+    );
     final employeeCountController = TextEditingController(
       text: land.employeeCount != null ? land.employeeCount.toString() : '',
     );
-    final frostStatusesController =
-        TextEditingController(text: land.frostStatuses ?? '');
+    final frostStatusesController = TextEditingController(
+      text: land.frostStatuses ?? '',
+    );
 
     showDialog(
       context: context,
@@ -231,13 +241,15 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                 ),
                 TextField(
                   controller: irrigationSourceController,
-                  decoration:
-                      const InputDecoration(labelText: 'Sulama Kaynağı'),
+                  decoration: const InputDecoration(
+                    labelText: 'Sulama Kaynağı',
+                  ),
                 ),
                 TextField(
                   controller: irrigationMethodController,
-                  decoration:
-                      const InputDecoration(labelText: 'Sulama Yöntemi'),
+                  decoration: const InputDecoration(
+                    labelText: 'Sulama Yöntemi',
+                  ),
                 ),
 
                 // New fields
@@ -256,8 +268,9 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                 TextField(
                   controller: employeeCountController,
                   keyboardType: TextInputType.number,
-                  decoration:
-                      const InputDecoration(labelText: 'Çalışan Sayısı'),
+                  decoration: const InputDecoration(
+                    labelText: 'Çalışan Sayısı',
+                  ),
                 ),
                 TextField(
                   controller: frostStatusesController,
@@ -288,8 +301,9 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                   land.recentProducts = recentProductsController.text;
                   land.issues = issuesController.text;
                   land.equipments = equipmentsController.text;
-                  land.employeeCount =
-                      int.tryParse(employeeCountController.text);
+                  land.employeeCount = int.tryParse(
+                    employeeCountController.text,
+                  );
                   land.frostStatuses = frostStatusesController.text;
                 });
 
@@ -307,107 +321,110 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(land.name),
-      ),
+      appBar: AppBar(title: Text(land.name)),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: isUpdating
-            ? const Center(child: CircularProgressIndicator())
-            : ListView(
-                children: [
-                  Text('Konum: ${land.location}'),
-                  Text('Toprak Analizi: ${land.soilAnalysis}'),
-                  Text('Bütçe: ${land.budget}'),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _selectCrop,
-                    child: Text(
-                      land.chosenCrop == null
-                          ? 'Ürün Seç/Değiştir'
-                          : 'Seçili Ürün: ${land.chosenCrop}',
+        child:
+            isUpdating
+                ? const Center(child: CircularProgressIndicator())
+                : ListView(
+                  children: [
+                    Text('Konum: ${land.location}'),
+                    Text('Toprak Analizi: ${land.soilAnalysis}'),
+                    Text('Bütçe: ${land.budget}'),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: _selectCrop,
+                      child: Text(
+                        land.chosenCrop == null
+                            ? 'Ürün Seç/Değiştir'
+                            : 'Seçili Ürün: ${land.chosenCrop}',
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => TaskListScreen(
-                            land: land,
-                            onUpdate: (updatedLand) {
-                              setState(() {
-                                land = updatedLand;
-                              });
-                              _updateLandBackend();
-                            },
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (_) => TaskListScreen(
+                                  land: land,
+                                  onUpdate: (updatedLand) {
+                                    setState(() {
+                                      land = updatedLand;
+                                    });
+                                    _updateLandBackend();
+                                  },
+                                ),
+                          ),
+                        );
+                      },
+                      child: const Text('Sulama/Gübreleme Görevleri'),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: _takePhotoOrUpload,
+                      child: const Text('Hasat Kontrol Fotoğrafı'),
+                    ),
+                    const SizedBox(height: 20),
+                    // Ek alanların görüntülendiği bölüm
+                    const Text(
+                      'Ek Bilgiler',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (land.size != null)
+                      Text('Büyüklük: ${land.size} ${land.sizeUnit ?? ''}'),
+                    if (land.landStructure != null)
+                      Text('Arazi Yapısı: ${land.landStructure}'),
+                    if (land.soilColor != null)
+                      Text('Toprak Rengi: ${land.soilColor}'),
+                    if (land.soilComposition != null)
+                      Text('Toprak Yapısı: ${land.soilComposition}'),
+                    if (land.stoneStatus != null)
+                      Text('Taş Durumu: ${land.stoneStatus}'),
+                    if (land.waterStatus != null)
+                      Text('Su Durumu: ${land.waterStatus}'),
+                    if (land.irrigationSource != null)
+                      Text('Sulama Kaynağı: ${land.irrigationSource}'),
+                    if (land.irrigationMethod != null)
+                      Text('Sulama Yöntemi: ${land.irrigationMethod}'),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: _editAdditionalDetails,
+                      child: const Text('Ek Bilgileri Düzenle'),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _showExpenseDialog,
+                            child: const Text('Gider Ekle'),
                           ),
                         ),
-                      );
-                    },
-                    child: const Text('Sulama/Gübreleme Görevleri'),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _takePhotoOrUpload,
-                    child: const Text('Hasat Kontrol Fotoğrafı'),
-                  ),
-                  const SizedBox(height: 20),
-                  // Ek alanların görüntülendiği bölüm
-                  const Text(
-                    'Ek Bilgiler',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  if (land.size != null)
-                    Text('Büyüklük: ${land.size} ${land.sizeUnit ?? ''}'),
-                  if (land.landStructure != null)
-                    Text('Arazi Yapısı: ${land.landStructure}'),
-                  if (land.soilColor != null)
-                    Text('Toprak Rengi: ${land.soilColor}'),
-                  if (land.soilComposition != null)
-                    Text('Toprak Yapısı: ${land.soilComposition}'),
-                  if (land.stoneStatus != null)
-                    Text('Taş Durumu: ${land.stoneStatus}'),
-                  if (land.waterStatus != null)
-                    Text('Su Durumu: ${land.waterStatus}'),
-                  if (land.irrigationSource != null)
-                    Text('Sulama Kaynağı: ${land.irrigationSource}'),
-                  if (land.irrigationMethod != null)
-                    Text('Sulama Yöntemi: ${land.irrigationMethod}'),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _editAdditionalDetails,
-                    child: const Text('Ek Bilgileri Düzenle'),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _showExpenseDialog,
-                          child: const Text('Gider Ekle'),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _showIncomeDialog,
+                            child: const Text('Gelir Ekle'),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _showIncomeDialog,
-                          child: const Text('Gelir Ekle'),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _calculateProfitMargin,
-                    child: const Text('Kâr Marjını Göster'),
-                  ),
-                  const SizedBox(height: 10),
-                  Text('Toplam Gider: ${land.totalExpense}'),
-                  Text('Toplam Gelir: ${land.totalIncome}'),
-                ],
-              ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: _calculateProfitMargin,
+                      child: const Text('Kâr Marjını Göster'),
+                    ),
+                    const SizedBox(height: 10),
+                    Text('Toplam Gider: ${land.totalExpense}'),
+                    Text('Toplam Gelir: ${land.totalIncome}'),
+                  ],
+                ),
       ),
     );
   }

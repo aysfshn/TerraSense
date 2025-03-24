@@ -20,7 +20,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> loginUser() async {
     final url = Uri.parse(
-        'http://127.0.0.1:5000/auth/giris'); // Geliştirme ortamı URL'si
+      'http://127.0.0.1:5000/auth/giris',
+    ); // Geliştirme ortamı URL'si
     setState(() {
       isLoading = true;
     });
@@ -28,10 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'email': _email,
-          'password': _password,
-        }),
+        body: json.encode({'email': _email, 'password': _password}),
       );
       final responseData = json.decode(response.body);
       if (response.statusCode == 200) {
@@ -49,32 +47,34 @@ class _LoginScreenState extends State<LoginScreen> {
         // Hata mesajını gösterin
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Hata'),
-            content: Text(responseData['hata'] ?? 'Giriş başarısız'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Tamam'),
+          builder:
+              (context) => AlertDialog(
+                title: const Text('Hata'),
+                content: Text(responseData['hata'] ?? 'Giriş başarısız'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Tamam'),
+                  ),
+                ],
               ),
-            ],
-          ),
         );
       }
     } catch (e) {
       // Ağ veya diğer hataları yönetin
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Hata'),
-          content: Text('Bir hata oluştu: $e'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Tamam'),
+        builder:
+            (context) => AlertDialog(
+              title: const Text('Hata'),
+              content: Text('Bir hata oluştu: $e'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Tamam'),
+                ),
+              ],
             ),
-          ],
-        ),
       );
     } finally {
       setState(() {
@@ -86,9 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Giriş Yap'),
-      ),
+      appBar: AppBar(title: const Text('Giriş Yap')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -123,14 +121,14 @@ class _LoginScreenState extends State<LoginScreen> {
               isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _formKey.currentState!.save();
-                          loginUser();
-                        }
-                      },
-                      child: const Text('Giriş Yap'),
-                    ),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        loginUser();
+                      }
+                    },
+                    child: const Text('Giriş Yap'),
+                  ),
             ],
           ),
         ),

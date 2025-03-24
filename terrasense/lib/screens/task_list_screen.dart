@@ -7,11 +7,8 @@ class TaskListScreen extends StatefulWidget {
   final Land land;
   final Function(Land) onUpdate;
 
-  const TaskListScreen({
-    Key? key,
-    required this.land,
-    required this.onUpdate,
-  }) : super(key: key);
+  const TaskListScreen({Key? key, required this.land, required this.onUpdate})
+    : super(key: key);
 
   @override
   State<TaskListScreen> createState() => _TaskListScreenState();
@@ -38,9 +35,9 @@ class _TaskListScreenState extends State<TaskListScreen> {
       });
       widget.onUpdate(updatedLand);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Güncelleme hatası: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Güncelleme hatası: $e')));
     } finally {
       setState(() {
         isUpdating = false;
@@ -70,24 +67,23 @@ class _TaskListScreenState extends State<TaskListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Görevler'),
-      ),
-      body: isUpdating
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: land.tasks.length,
-              itemBuilder: (context, index) {
-                final task = land.tasks[index];
-                return CheckboxListTile(
-                  title: Text(task.taskName),
-                  value: task.isDone,
-                  onChanged: (val) {
-                    _toggleTask(index);
-                  },
-                );
-              },
-            ),
+      appBar: AppBar(title: const Text('Görevler')),
+      body:
+          isUpdating
+              ? const Center(child: CircularProgressIndicator())
+              : ListView.builder(
+                itemCount: land.tasks.length,
+                itemBuilder: (context, index) {
+                  final task = land.tasks[index];
+                  return CheckboxListTile(
+                    title: Text(task.taskName),
+                    value: task.isDone,
+                    onChanged: (val) {
+                      _toggleTask(index);
+                    },
+                  );
+                },
+              ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           String? newTask = await _showAddTaskDialog();
