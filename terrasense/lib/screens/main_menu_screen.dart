@@ -32,10 +32,9 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
         lands = fetchedLands;
       });
     } catch (e) {
-      // Hata durumunu yönetin (örneğin, Snackbar ile)
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Araziler alınamadı: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Araziler alınamadı: $e')),
+      );
     } finally {
       setState(() {
         isLoading = false;
@@ -59,42 +58,44 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Ana Menü')),
-      body:
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : lands.isEmpty
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : lands.isEmpty
               ? const Center(child: Text('Henüz arazi eklemediniz.'))
               : ListView.builder(
-                itemCount: lands.length,
-                itemBuilder: (context, index) {
-                  final land = lands[index];
-                  return Card(
-                    child: ListTile(
-                      title: Text(land.name),
-                      subtitle: Text(
-                        'Tip: ${land.landType} - Bakım yüzdesi: ${land.carePercentage.toStringAsFixed(1)}%',
+                  itemCount: lands.length,
+                  itemBuilder: (context, index) {
+                    final land = lands[index];
+                    return Card(
+                      child: ListTile(
+                        title: Text(land.name),
+                        subtitle: Text(
+                          'Tip: ${land.landType} - Bakım yüzdesi: ${land.carePercentage.toStringAsFixed(1)}%',
+                        ),
+                        trailing: const Icon(Icons.arrow_forward_ios),
+                        onTap: () async {
+                          final result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => LandDetailScreen(
+                                land: land,
+                                onUpdate: (updated) =>
+                                    _updateLand(updated, index),
+                              ),
+                            ),
+                          );
+                          if (result == 'deleted') {
+                            setState(() {
+                              lands.removeAt(index);
+                            });
+                          } else if (result is Land) {
+                            _updateLand(result, index);
+                          }
+                        },
                       ),
-                      trailing: const Icon(Icons.arrow_forward_ios),
-                      onTap: () async {
-                        final updatedLand = await Navigator.push<Land>(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (_) => LandDetailScreen(
-                                  land: land,
-                                  onUpdate:
-                                      (updated) => _updateLand(updated, index),
-                                ),
-                          ),
-                        );
-                        if (updatedLand != null) {
-                          _updateLand(updatedLand, index);
-                        }
-                      },
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final newLand = await Navigator.push<Land?>(
