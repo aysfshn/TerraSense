@@ -1,58 +1,85 @@
+// login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'main_menu_screen.dart'; // Giriş başarılı olunca yönleneceğiniz ekran
+import 'package:shared_preferences/shared_preferences.dart';
+import 'main_menu_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
-
   String _email = '';
   String _password = '';
+  bool isLoading = false;
 
-  Future<void> _login() async {
-    setState(() => _isLoading = true);
-
+  Future<void> loginUser() async {
+    final url = Uri.parse(
+        'http://127.0.0.1:5000/auth/giris'); // Geliştirme ortamı URL'si
+    setState(() {
+      isLoading = true;
+    });
     try {
-      // Flask’ta /auth/giris endpointi
-      final url = Uri.parse("http://127.0.0.1:5000/auth/giris");
-      // Android Emülatör -> "http://10.0.2.2:5000/auth/giris"
-
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "email": _email,
-          "password": _password,
+        body: json.encode({
+          'email': _email,
+          'password': _password,
         }),
       );
-
+      final responseData = json.decode(response.body);
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        // Giriş başarılı, token'ı SharedPreferences'e kaydedin
+        final token = responseData['token'];
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('authToken', token);
 
+        // MainMenuScreen'e geçiş yapın
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const MainMenuScreen()),
         );
       } else {
-        final msg = jsonDecode(response.body);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Giriş hatası: ${msg['hata'] ?? response.statusCode}")),
+        // Hata mesajını gösterin
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Hata'),
+            content: Text(responseData['hata'] ?? 'Giriş başarısız'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Tamam'),
+              ),
+            ],
+          ),
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Hata: $e")),
+      // Ağ veya diğer hataları yönetin
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Hata'),
+          content: Text('Bir hata oluştu: $e'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Tamam'),
+            ),
+          ],
+        ),
       );
     } finally {
-      setState(() => _isLoading = false);
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -60,36 +87,46 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Giriş Yap"),
+        title: const Text('Giriş Yap'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
-          child: Column(
+          child: ListView(
             children: [
-              // E-Posta
               TextFormField(
                 decoration: const InputDecoration(labelText: 'E-posta'),
                 onSaved: (val) => _email = val ?? '',
-                validator: (val) => (val == null || val.isEmpty) ? 'E-posta giriniz' : null,
+                validator: (val) {
+                  if (val == null || val.isEmpty) {
+                    return 'Lütfen e-posta girin';
+                  }
+                  return null;
+                },
               ),
-              // Şifre
               TextFormField(
                 decoration: const InputDecoration(labelText: 'Şifre'),
                 obscureText: true,
                 onSaved: (val) => _password = val ?? '',
-                validator: (val) => (val == null || val.isEmpty) ? 'Şifre giriniz' : null,
+                validator: (val) {
+                  if (val == null || val.isEmpty) {
+                    return 'Lütfen şifre girin';
+                  }
+                  if (val.length < 6) {
+                    return 'Şifre en az 6 karakter olmalı';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 20),
-
-              _isLoading
-                  ? const CircularProgressIndicator()
+              isLoading
+                  ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           _formKey.currentState!.save();
-                          _login();
+                          loginUser();
                         }
                       },
                       child: const Text('Giriş Yap'),

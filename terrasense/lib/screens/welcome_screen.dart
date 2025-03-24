@@ -1,6 +1,7 @@
+// welcome_screen.dart
 import 'package:flutter/material.dart';
-import 'package:terra_sense/screens/login_screen.dart';
 import 'sign_up_screen.dart';
+import 'login_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
@@ -25,8 +26,6 @@ class WelcomeScreen extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 40),
-
-            // Üye Ol butonu
             ElevatedButton(
               onPressed: () {
                 // Üye Ol ekranına yönlendir
@@ -37,11 +36,9 @@ class WelcomeScreen extends StatelessWidget {
               },
               child: const Text('Üye Ol'),
             ),
-
-            // Giriş Yap butonu
             TextButton(
               onPressed: () {
-                // Giriş ekranına yönlendir
+                // Giriş yapma ekranına yönlendir
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const LoginScreen()),

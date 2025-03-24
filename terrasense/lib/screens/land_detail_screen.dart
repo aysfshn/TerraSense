@@ -1,7 +1,9 @@
+// land_detail_screen.dart
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/land.dart';
-import 'task_list_screen.dart';
-import 'package:image_picker/image_picker.dart'; // fotoğraf yükleme örneği için
+import '../screens/task_list_screen.dart';
+import 'package:terra_sense/ApiService.dart';
 
 class LandDetailScreen extends StatefulWidget {
   final Land land;
@@ -19,6 +21,7 @@ class LandDetailScreen extends StatefulWidget {
 
 class _LandDetailScreenState extends State<LandDetailScreen> {
   late Land land;
+  bool isUpdating = false;
 
   @override
   void initState() {
@@ -26,11 +29,29 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
     land = widget.land;
   }
 
- 
-
+  // Seçilen değişiklikleri backend'e gönderir
+  Future<void> _updateLandBackend() async {
+    setState(() {
+      isUpdating = true;
+    });
+    try {
+      final updatedLand = await ApiService.updateLand(land);
+      setState(() {
+        land = updatedLand;
+      });
+      widget.onUpdate(updatedLand);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Güncelleme hatası: $e')),
+      );
+    } finally {
+      setState(() {
+        isUpdating = false;
+      });
+    }
+  }
 
   void _selectCrop() async {
-    // Kullanıcıya önerilen ürün listesini gösteren bir basit dialog
     final selected = await showDialog<String>(
       context: context,
       builder: (_) => SimpleDialog(
@@ -42,7 +63,6 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
               child: Text(crop),
             );
           }).toList(),
-          // Kullanıcı istediği ürünü yoksa manuel girmesi için:
           SimpleDialogOption(
             onPressed: () => Navigator.pop(context, 'manual'),
             child: const Text('Listede yok, kendim gireyim.'),
@@ -54,7 +74,6 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
     if (selected == null) return;
 
     if (selected == 'manual') {
-      // Kullanıcıdan manuel ürün girmesini iste
       String? manualCrop = await _showManualInputDialog();
       if (manualCrop != null && manualCrop.trim().isNotEmpty) {
         setState(() {
@@ -66,7 +85,7 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
         land.chosenCrop = selected;
       });
     }
-    widget.onUpdate(land);
+    _updateLandBackend();
   }
 
   Future<String?> _showManualInputDialog() async {
@@ -102,32 +121,29 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
   }
 
   void _takePhotoOrUpload() async {
-    // Örnek olarak ImagePicker ile fotoğraf alınabilir. 
-    // Bu fotoğraf “hasat vakti geldi mi?” gibi bir yapay zeka modeline gönderilebilir.
     final ImagePicker _picker = ImagePicker();
     final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
     if (photo != null) {
-      // Fotoğraf seçildi. Sunucuya gönderilip “hasat yapabilir mi?” analizi yaptırılabilir.
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Fotoğraf çekildi: ${photo.path}")),
       );
+      // Fotoğraf sunucuya gönderilip analiz edilebilir.
     }
   }
 
   void _updateExpenses(double expense) {
     setState(() {
       land.totalExpense += expense;
-      // Bakım yüzdesini örnek olarak masrafla biraz ilişkilendirebiliriz
-      land.carePercentage += 3; 
+      land.carePercentage += 3;
     });
-    widget.onUpdate(land);
+    _updateLandBackend();
   }
 
   void _updateIncome(double income) {
     setState(() {
       land.totalIncome += income;
     });
-    widget.onUpdate(land);
+    _updateLandBackend();
   }
 
   void _calculateProfitMargin() {
@@ -147,6 +163,147 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
     );
   }
 
+  // Ek alanları düzenleme diyalog fonksiyonu
+  void _editAdditionalDetails() {
+    // Existing controllers
+    final sizeController =
+        TextEditingController(text: land.size?.toString() ?? '');
+    final landStructureController =
+        TextEditingController(text: land.landStructure ?? '');
+    final soilColorController =
+        TextEditingController(text: land.soilColor ?? '');
+    final soilCompositionController =
+        TextEditingController(text: land.soilComposition ?? '');
+    final stoneStatusController =
+        TextEditingController(text: land.stoneStatus ?? '');
+    final waterStatusController =
+        TextEditingController(text: land.waterStatus ?? '');
+    final irrigationSourceController =
+        TextEditingController(text: land.irrigationSource ?? '');
+    final irrigationMethodController =
+        TextEditingController(text: land.irrigationMethod ?? '');
+
+    // New fields
+    final recentProductsController =
+        TextEditingController(text: land.recentProducts ?? '');
+    final issuesController = TextEditingController(text: land.issues ?? '');
+    final equipmentsController =
+        TextEditingController(text: land.equipments ?? '');
+    final employeeCountController = TextEditingController(
+      text: land.employeeCount != null ? land.employeeCount.toString() : '',
+    );
+    final frostStatusesController =
+        TextEditingController(text: land.frostStatuses ?? '');
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Ek Bilgileri Düzenle'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                // Existing fields
+                TextField(
+                  controller: sizeController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Büyüklük'),
+                ),
+                TextField(
+                  controller: landStructureController,
+                  decoration: const InputDecoration(labelText: 'Arazi Yapısı'),
+                ),
+                TextField(
+                  controller: soilColorController,
+                  decoration: const InputDecoration(labelText: 'Toprak Rengi'),
+                ),
+                TextField(
+                  controller: soilCompositionController,
+                  decoration: const InputDecoration(labelText: 'Toprak Yapısı'),
+                ),
+                TextField(
+                  controller: stoneStatusController,
+                  decoration: const InputDecoration(labelText: 'Taş Durumu'),
+                ),
+                TextField(
+                  controller: waterStatusController,
+                  decoration: const InputDecoration(labelText: 'Su Durumu'),
+                ),
+                TextField(
+                  controller: irrigationSourceController,
+                  decoration:
+                      const InputDecoration(labelText: 'Sulama Kaynağı'),
+                ),
+                TextField(
+                  controller: irrigationMethodController,
+                  decoration:
+                      const InputDecoration(labelText: 'Sulama Yöntemi'),
+                ),
+
+                // New fields
+                TextField(
+                  controller: recentProductsController,
+                  decoration: const InputDecoration(labelText: 'Son Ürünler'),
+                ),
+                TextField(
+                  controller: issuesController,
+                  decoration: const InputDecoration(labelText: 'Sorunlar'),
+                ),
+                TextField(
+                  controller: equipmentsController,
+                  decoration: const InputDecoration(labelText: 'Ekipmanlar'),
+                ),
+                TextField(
+                  controller: employeeCountController,
+                  keyboardType: TextInputType.number,
+                  decoration:
+                      const InputDecoration(labelText: 'Çalışan Sayısı'),
+                ),
+                TextField(
+                  controller: frostStatusesController,
+                  decoration: const InputDecoration(labelText: 'Don Durumları'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('İptal'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  // Existing fields
+                  land.size = double.tryParse(sizeController.text);
+                  land.landStructure = landStructureController.text;
+                  land.soilColor = soilColorController.text;
+                  land.soilComposition = soilCompositionController.text;
+                  land.stoneStatus = stoneStatusController.text;
+                  land.waterStatus = waterStatusController.text;
+                  land.irrigationSource = irrigationSourceController.text;
+                  land.irrigationMethod = irrigationMethodController.text;
+
+                  // New fields
+                  land.recentProducts = recentProductsController.text;
+                  land.issues = issuesController.text;
+                  land.equipments = equipmentsController.text;
+                  land.employeeCount =
+                      int.tryParse(employeeCountController.text);
+                  land.frostStatuses = frostStatusesController.text;
+                });
+
+                _updateLandBackend();
+                Navigator.pop(context);
+              },
+              child: const Text('Kaydet'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,79 +312,102 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            Text('Konum: ${land.location}'),
-            Text('Toprak Analizi: ${land.soilAnalysis}'),
-            Text('Bütçe: ${land.budget}'),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _selectCrop,
-              child: Text(
-                land.chosenCrop == null
-                    ? 'Ürün Seç/Değiştir'
-                    : 'Seçili Ürün: ${land.chosenCrop}',
-              ),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                // Görev listesine git (sulama, gübreleme vb.)
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => TaskListScreen(
-                      land: land,
-                      onUpdate: (updatedLand) {
-                        setState(() {
-                          land = updatedLand;
-                        });
-                        widget.onUpdate(land);
-                      },
+        child: isUpdating
+            ? const Center(child: CircularProgressIndicator())
+            : ListView(
+                children: [
+                  Text('Konum: ${land.location}'),
+                  Text('Toprak Analizi: ${land.soilAnalysis}'),
+                  Text('Bütçe: ${land.budget}'),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: _selectCrop,
+                    child: Text(
+                      land.chosenCrop == null
+                          ? 'Ürün Seç/Değiştir'
+                          : 'Seçili Ürün: ${land.chosenCrop}',
                     ),
                   ),
-                );
-              },
-              child: const Text('Sulama/Gübreleme Görevleri'),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _takePhotoOrUpload,
-              child: const Text('Hasat Kontrol Fotoğrafı'),
-            ),
-            const SizedBox(height: 20),
-            // Gider/Gelir ve Kar marjı hesaplama butonları
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
+                  const SizedBox(height: 10),
+                  ElevatedButton(
                     onPressed: () {
-                      _showExpenseDialog();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => TaskListScreen(
+                            land: land,
+                            onUpdate: (updatedLand) {
+                              setState(() {
+                                land = updatedLand;
+                              });
+                              _updateLandBackend();
+                            },
+                          ),
+                        ),
+                      );
                     },
-                    child: const Text('Gider Ekle'),
+                    child: const Text('Sulama/Gübreleme Görevleri'),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _showIncomeDialog();
-                    },
-                    child: const Text('Gelir Ekle'),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: _takePhotoOrUpload,
+                    child: const Text('Hasat Kontrol Fotoğrafı'),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _calculateProfitMargin,
-              child: const Text('Kâr Marjını Göster'),
-            ),
-            const SizedBox(height: 10),
-            Text('Toplam Gider: ${land.totalExpense}'),
-            Text('Toplam Gelir: ${land.totalIncome}'),
-          ],
-        ),
+                  const SizedBox(height: 20),
+                  // Ek alanların görüntülendiği bölüm
+                  const Text(
+                    'Ek Bilgiler',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  if (land.size != null)
+                    Text('Büyüklük: ${land.size} ${land.sizeUnit ?? ''}'),
+                  if (land.landStructure != null)
+                    Text('Arazi Yapısı: ${land.landStructure}'),
+                  if (land.soilColor != null)
+                    Text('Toprak Rengi: ${land.soilColor}'),
+                  if (land.soilComposition != null)
+                    Text('Toprak Yapısı: ${land.soilComposition}'),
+                  if (land.stoneStatus != null)
+                    Text('Taş Durumu: ${land.stoneStatus}'),
+                  if (land.waterStatus != null)
+                    Text('Su Durumu: ${land.waterStatus}'),
+                  if (land.irrigationSource != null)
+                    Text('Sulama Kaynağı: ${land.irrigationSource}'),
+                  if (land.irrigationMethod != null)
+                    Text('Sulama Yöntemi: ${land.irrigationMethod}'),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: _editAdditionalDetails,
+                    child: const Text('Ek Bilgileri Düzenle'),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _showExpenseDialog,
+                          child: const Text('Gider Ekle'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _showIncomeDialog,
+                          child: const Text('Gelir Ekle'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: _calculateProfitMargin,
+                    child: const Text('Kâr Marjını Göster'),
+                  ),
+                  const SizedBox(height: 10),
+                  Text('Toplam Gider: ${land.totalExpense}'),
+                  Text('Toplam Gelir: ${land.totalIncome}'),
+                ],
+              ),
       ),
     );
   }

@@ -7,8 +7,7 @@ from src.models import User
 
 def generate_token(user_id):
     payload = {
-        'user_id': user_id,
-        'exp': datetime.utcnow() + timedelta(days=1)
+        'user_id': user_id
     }
     return jwt.encode(payload, os.getenv('SECRET_KEY'), algorithm='HS256')
 

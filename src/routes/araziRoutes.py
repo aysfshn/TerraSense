@@ -104,7 +104,7 @@ def arazi_detay(current_user, arazi_id):
     
     return jsonify(arazi.to_dict())
 
-@arazi_bp.route('/<int:arazi_id>', methods=['PUT'])
+@arazi_bp.route('/<int:arazi_id>/', methods=['PUT'])
 @token_required
 def arazi_guncelle(current_user, arazi_id):
     arazi = Arazi.query.filter_by(id=arazi_id, kullanici_id=current_user.id).first()

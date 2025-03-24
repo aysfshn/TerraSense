@@ -13,11 +13,11 @@ class TerraSenseApp extends StatelessWidget {
     return MaterialApp(
       title: 'TerraSense',
       theme: ThemeData(
-        primarySwatch: Colors.green,      // Yeşil tonlar
+        primarySwatch: Colors.green, // Yeşil tonlar
         scaffoldBackgroundColor: Colors.grey[200], // Arka planı hafif gri
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,  // Buton rengi
+            backgroundColor: Colors.green, // Buton rengi
             textStyle: const TextStyle(color: Colors.white),
           ),
         ),
