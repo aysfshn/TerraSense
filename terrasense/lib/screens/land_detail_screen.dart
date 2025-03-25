@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import '../models/land.dart';
 import '../screens/task_list_screen.dart';
 import 'package:terra_sense/ApiService.dart';
+import '../screens/advicescreen.dart'; // Yeni: Tavsiye ekranı
 
 class LandDetailScreen extends StatefulWidget {
   final Land land;
@@ -38,9 +39,9 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
       });
       widget.onUpdate(updatedLand);
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Güncelleme hatası: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Güncelleme hatası: $e')),
+      );
     } finally {
       setState(() {
         isUpdating = false;
@@ -348,6 +349,23 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
     }
   }
 
+  // Yeni: Tavsiye al butonu için fonksiyon
+  Future<void> _getAdvice() async {
+    try {
+      final adviceData = await ApiService.getAdvice(land.id);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => AdviceScreen(adviceData: adviceData),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Tavsiye alınırken hata oluştu: $e')),
+      );
+    }
+  }
+
   void _showExpenseDialog() async {
     double expense = 0.0;
     await showDialog(
@@ -470,6 +488,12 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                   ElevatedButton(
                     onPressed: _takePhotoOrUpload,
                     child: const Text('Hasat Kontrol Fotoğrafı'),
+                  ),
+                  const SizedBox(height: 10),
+                  // Yeni: Tavsiye Al butonu
+                  ElevatedButton(
+                    onPressed: _getAdvice,
+                    child: const Text('Tavsiye Al'),
                   ),
                   const SizedBox(height: 20),
                   const Text(
