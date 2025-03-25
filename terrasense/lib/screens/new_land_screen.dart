@@ -87,42 +87,35 @@ class _NewLandScreenState extends State<NewLandScreen> {
               ),
               // Konum
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Konum'),
+                decoration: InputDecoration(
+                  hintText: 'İl/İlçe',
+                  hintStyle: TextStyle(
+                      color: Colors.grey[
+                          600]), // İsteğe bağlı: ipucu rengini ayarlayabilirsiniz
+                ),
                 onSaved: (val) => _location = val ?? '',
               ),
+
               // Toprak Analizi (DropDown)
-              DropdownButtonFormField<String>(
+              TextFormField(
                 decoration: const InputDecoration(labelText: 'Toprak Analizi'),
-                value: _selectedSoilAnalysis,
-                items: ['Kireçli', 'Killi', 'Kumlu', 'Humuslu', 'Diğer'].map((
-                  soilType,
-                ) {
-                  return DropdownMenuItem<String>(
-                    value: soilType,
-                    child: Text(soilType),
-                  );
-                }).toList(),
-                onChanged: (val) {
-                  setState(() {
-                    _selectedSoilAnalysis = val ?? 'Kireçli';
-                    _isOtherSoilSelected = (val == 'Diğer');
-                  });
+                onSaved: (val) {
+                  if (val != null && val.isNotEmpty) {
+                    _selectedSoilAnalysis = val;
+                  }
+                },
+                validator: (val) {
+                  if (val == null || val.isEmpty) {
+                    return 'Lütfen toprak analizi giriniz';
+                  }
+                  return null;
                 },
               ),
-              if (_isOtherSoilSelected)
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Toprak Analizi (Diğer)',
-                  ),
-                  onSaved: (val) {
-                    if (_isOtherSoilSelected && val != null && val.isNotEmpty) {
-                      _selectedSoilAnalysis = val;
-                    }
-                  },
-                ),
+
               // Bütçe
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Ayrılacak Bütçe'),
+                decoration: const InputDecoration(
+                    labelText: 'Ayrılacak Bütçe', suffixText: '₺'),
                 keyboardType: TextInputType.number,
                 onSaved: (val) {
                   if (val != null && val.isNotEmpty) {
@@ -287,7 +280,7 @@ class _NewLandScreenState extends State<NewLandScreen> {
               // **Eklemek istediğiniz yeni alanlar:**
               TextFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Son Ürünler (Örn. Buğday, Mısır)',
+                  labelText: 'Hasat Edilen Son Ürünler (Örn. Buğday, Mısır)',
                 ),
                 onSaved: (val) => _recentProducts = val,
               ),
@@ -308,9 +301,28 @@ class _NewLandScreenState extends State<NewLandScreen> {
                   }
                 },
               ),
-              TextFormField(
+              DropdownButtonFormField<String>(
                 decoration: const InputDecoration(labelText: 'Don Durumları'),
+                value:
+                    _frostStatuses, // Varsayılan değeri "Don Yok" olarak ayarladık
+                items: ['Don Yok', 'Ara Sıra Don', 'Sık Don'].map((status) {
+                  return DropdownMenuItem<String>(
+                    value: status,
+                    child: Text(status),
+                  );
+                }).toList(),
+                onChanged: (val) {
+                  setState(() {
+                    _frostStatuses = val;
+                  });
+                },
                 onSaved: (val) => _frostStatuses = val,
+                validator: (val) {
+                  if (val == null || val.isEmpty) {
+                    return 'Lütfen don durumunu seçiniz';
+                  }
+                  return null;
+                },
               ),
 
               const SizedBox(height: 20),

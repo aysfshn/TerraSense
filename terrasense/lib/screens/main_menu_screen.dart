@@ -4,6 +4,7 @@ import 'land_detail_screen.dart';
 import 'new_land_screen.dart';
 import '../models/land.dart';
 import 'package:terra_sense/ApiService.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 class MainMenuScreen extends StatefulWidget {
   const MainMenuScreen({Key? key}) : super(key: key);
@@ -70,9 +71,22 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                       child: ListTile(
                         title: Text(land.name),
                         subtitle: Text(
-                          'Tip: ${land.landType} - Bakım yüzdesi: ${land.carePercentage.toStringAsFixed(1)}%',
+                          'Tip: ${land.landType}',
                         ),
-                        trailing: const Icon(Icons.arrow_forward_ios),
+                        trailing: CircularPercentIndicator(
+                          radius: 20.0,
+                          lineWidth: 4.0,
+                          percent: land.carePercentage /
+                              100, // Örneğin, %10 için 0.1
+                          center: Text(
+                              "${land.carePercentage.toStringAsFixed(0)}%"),
+                          progressColor:
+                              Colors.lightBlue, // %10 olan kısmın rengi
+                          backgroundColor:
+                              Colors.blue[900]!, // Kalan %90'ın rengi
+                          circularStrokeCap: CircularStrokeCap
+                              .round, // Kenarların yuvarlak olması için
+                        ),
                         onTap: () async {
                           final result = await Navigator.push(
                             context,
