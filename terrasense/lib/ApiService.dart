@@ -116,4 +116,18 @@ class ApiService {
           'Arazi silinirken hata oluştu. Status Code: ${response.statusCode}');
     }
   }
+
+  static Future<Map<String, dynamic>> getAdvice(String landId) async {
+    final url = Uri.parse('$baseUrl/arazi/tavsiye/$landId');
+    final headers = await _getHeaders();
+
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data;
+    } else {
+      throw Exception('Tavsiye alınamadı. Status Code: ${response.statusCode}');
+    }
+  }
 }
