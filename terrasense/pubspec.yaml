@@ -12,6 +12,7 @@ dependencies:
   cupertino_icons: ^1.0.5
   http: ^0.13.5
   shared_preferences: ^2.0.15
+  flutter_markdown: ^0.6.18
   # Bildirim, resim yükleme vs. için ek paketleri sonradan ekleyebilirsiniz.
   # Örneğin local_notifications paketi, image_picker vb.
 
