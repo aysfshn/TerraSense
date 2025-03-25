@@ -130,4 +130,19 @@ class ApiService {
       throw Exception('Tavsiye alınamadı. Status Code: ${response.statusCode}');
     }
   }
+
+  static Future<Map<String, dynamic>> getWeather(String landId) async {
+    final url = Uri.parse('$baseUrl/arazi/hava_durumu/$landId');
+    final headers = await _getHeaders();
+
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data; // JSON cevabı döndürür
+    } else {
+      throw Exception(
+          'Hava durumu alınamadı. Status Code: ${response.statusCode}');
+    }
+  }
 }

@@ -1,4 +1,3 @@
-// task_list_screen.dart
 import 'package:flutter/material.dart';
 import 'package:terra_sense/ApiService.dart';
 import '../models/land.dart';
@@ -8,7 +7,7 @@ class TaskListScreen extends StatefulWidget {
   final Function(Land) onUpdate;
 
   const TaskListScreen({Key? key, required this.land, required this.onUpdate})
-    : super(key: key);
+      : super(key: key);
 
   @override
   State<TaskListScreen> createState() => _TaskListScreenState();
@@ -24,27 +23,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
     land = widget.land;
   }
 
-  Future<void> _updateLandBackend() async {
-    setState(() {
-      isUpdating = true;
-    });
-    try {
-      final updatedLand = await ApiService.updateLand(land);
-      setState(() {
-        land = updatedLand;
-      });
-      widget.onUpdate(updatedLand);
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Güncelleme hatası: $e')));
-    } finally {
-      setState(() {
-        isUpdating = false;
-      });
-    }
-  }
-
+  // Not: Görevler backend'e gönderilmeyecek, sadece yerel state güncellenecek.
   void _toggleTask(int index) {
     setState(() {
       land.tasks[index].isDone = !land.tasks[index].isDone;
@@ -54,36 +33,36 @@ class _TaskListScreenState extends State<TaskListScreen> {
         land.carePercentage -= 5;
       }
     });
-    _updateLandBackend();
+    // Parent widget'e güncellemeyi bildiriyoruz.
+    widget.onUpdate(land);
   }
 
   void _addTask(String taskName) {
     setState(() {
       land.tasks.add(TaskItem(taskName: taskName));
     });
-    _updateLandBackend();
+    widget.onUpdate(land);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Görevler')),
-      body:
-          isUpdating
-              ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                itemCount: land.tasks.length,
-                itemBuilder: (context, index) {
-                  final task = land.tasks[index];
-                  return CheckboxListTile(
-                    title: Text(task.taskName),
-                    value: task.isDone,
-                    onChanged: (val) {
-                      _toggleTask(index);
-                    },
-                  );
-                },
-              ),
+      body: isUpdating
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: land.tasks.length,
+              itemBuilder: (context, index) {
+                final task = land.tasks[index];
+                return CheckboxListTile(
+                  title: Text(task.taskName),
+                  value: task.isDone,
+                  onChanged: (val) {
+                    _toggleTask(index);
+                  },
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           String? newTask = await _showAddTaskDialog();

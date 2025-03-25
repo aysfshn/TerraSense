@@ -1,17 +1,20 @@
-// land_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../models/land.dart';
 import '../screens/task_list_screen.dart';
 import 'package:terra_sense/ApiService.dart';
-import '../screens/advicescreen.dart'; // Yeni: Tavsiye ekranı
+import '../screens/advicescreen.dart';
+import '../screens/weather_screen.dart';
 
 class LandDetailScreen extends StatefulWidget {
   final Land land;
   final Function(Land) onUpdate;
 
-  const LandDetailScreen({Key? key, required this.land, required this.onUpdate})
-      : super(key: key);
+  const LandDetailScreen({
+    Key? key,
+    required this.land,
+    required this.onUpdate,
+  }) : super(key: key);
 
   @override
   State<LandDetailScreen> createState() => _LandDetailScreenState();
@@ -27,25 +30,18 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
     land = widget.land;
   }
 
-  // Seçilen değişiklikleri backend'e gönderir
   Future<void> _updateLandBackend() async {
-    setState(() {
-      isUpdating = true;
-    });
+    setState(() => isUpdating = true);
     try {
       final updatedLand = await ApiService.updateLand(land);
-      setState(() {
-        land = updatedLand;
-      });
+      setState(() => land = updatedLand);
       widget.onUpdate(updatedLand);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Güncelleme hatası: $e')),
       );
     } finally {
-      setState(() {
-        isUpdating = false;
-      });
+      setState(() => isUpdating = false);
     }
   }
 
@@ -68,20 +64,15 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
         ],
       ),
     );
-
     if (selected == null) return;
 
     if (selected == 'manual') {
       String? manualCrop = await _showManualInputDialog();
       if (manualCrop != null && manualCrop.trim().isNotEmpty) {
-        setState(() {
-          land.chosenCrop = manualCrop;
-        });
+        setState(() => land.chosenCrop = manualCrop);
       }
     } else {
-      setState(() {
-        land.chosenCrop = selected;
-      });
+      setState(() => land.chosenCrop = selected);
     }
     _updateLandBackend();
   }
@@ -100,15 +91,11 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context),
               child: const Text('İptal'),
             ),
             ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context, input);
-              },
+              onPressed: () => Navigator.pop(context, input),
               child: const Text('Ekle'),
             ),
           ],
@@ -119,13 +106,13 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
   }
 
   void _takePhotoOrUpload() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
+    final ImagePicker picker = ImagePicker();
+    final XFile? photo = await picker.pickImage(source: ImageSource.camera);
     if (photo != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Fotoğraf çekildi: ${photo.path}")),
       );
-      // Fotoğraf sunucuya gönderilip analiz edilebilir.
+      // Fotoğrafı sunucuya gönderip analiz edebilirsiniz.
     }
   }
 
@@ -138,9 +125,7 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
   }
 
   void _updateIncome(double income) {
-    setState(() {
-      land.totalIncome += income;
-    });
+    setState(() => land.totalIncome += income);
     _updateLandBackend();
   }
 
@@ -161,9 +146,40 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
     );
   }
 
-  // Ek alanları düzenleme diyalog fonksiyonu
+  Future<void> _getWeather() async {
+    try {
+      final weatherResponse = await ApiService.getWeather(land.id);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              WeatherScreen(weatherData: weatherResponse['hava_durumu']),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Hava durumu alınırken hata oluştu: $e')),
+      );
+    }
+  }
+
+  Future<void> _getAdvice() async {
+    try {
+      final adviceData = await ApiService.getAdvice(land.id);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => AdviceScreen(adviceData: adviceData),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Tavsiye alınırken hata oluştu: $e')),
+      );
+    }
+  }
+
   void _editAdditionalDetails() {
-    // Existing controllers
     final sizeController = TextEditingController(
       text: land.size?.toString() ?? '',
     );
@@ -188,12 +204,12 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
     final irrigationMethodController = TextEditingController(
       text: land.irrigationMethod ?? '',
     );
-
-    // New fields
     final recentProductsController = TextEditingController(
       text: land.recentProducts ?? '',
     );
-    final issuesController = TextEditingController(text: land.issues ?? '');
+    final issuesController = TextEditingController(
+      text: land.issues ?? '',
+    );
     final equipmentsController = TextEditingController(
       text: land.equipments ?? '',
     );
@@ -212,7 +228,6 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
           content: SingleChildScrollView(
             child: Column(
               children: [
-                // Existing fields
                 TextField(
                   controller: sizeController,
                   keyboardType: TextInputType.number,
@@ -240,17 +255,14 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                 ),
                 TextField(
                   controller: irrigationSourceController,
-                  decoration: const InputDecoration(
-                    labelText: 'Sulama Kaynağı',
-                  ),
+                  decoration:
+                      const InputDecoration(labelText: 'Sulama Kaynağı'),
                 ),
                 TextField(
                   controller: irrigationMethodController,
-                  decoration: const InputDecoration(
-                    labelText: 'Sulama Yöntemi',
-                  ),
+                  decoration:
+                      const InputDecoration(labelText: 'Sulama Yöntemi'),
                 ),
-                // New fields
                 TextField(
                   controller: recentProductsController,
                   decoration: const InputDecoration(labelText: 'Son Ürünler'),
@@ -266,9 +278,8 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                 TextField(
                   controller: employeeCountController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Çalışan Sayısı',
-                  ),
+                  decoration:
+                      const InputDecoration(labelText: 'Çalışan Sayısı'),
                 ),
                 TextField(
                   controller: frostStatusesController,
@@ -285,7 +296,6 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                  // Existing fields
                   land.size = double.tryParse(sizeController.text);
                   land.landStructure = landStructureController.text;
                   land.soilColor = soilColorController.text;
@@ -294,7 +304,6 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                   land.waterStatus = waterStatusController.text;
                   land.irrigationSource = irrigationSourceController.text;
                   land.irrigationMethod = irrigationMethodController.text;
-                  // New fields
                   land.recentProducts = recentProductsController.text;
                   land.issues = issuesController.text;
                   land.equipments = equipmentsController.text;
@@ -302,7 +311,6 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
                       int.tryParse(employeeCountController.text);
                   land.frostStatuses = frostStatusesController.text;
                 });
-
                 _updateLandBackend();
                 Navigator.pop(context);
               },
@@ -314,7 +322,6 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
     );
   }
 
-  // Silme işlemini başlatan fonksiyon
   Future<void> _deleteLand() async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -333,7 +340,6 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
         ],
       ),
     );
-
     if (confirm == true) {
       try {
         await ApiService.deleteLand(land.id);
@@ -346,23 +352,6 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
           SnackBar(content: Text('Silme hatası: $e')),
         );
       }
-    }
-  }
-
-  // Yeni: Tavsiye al butonu için fonksiyon
-  Future<void> _getAdvice() async {
-    try {
-      final adviceData = await ApiService.getAdvice(land.id);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => AdviceScreen(adviceData: adviceData),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Tavsiye alınırken hata oluştu: $e')),
-      );
     }
   }
 
@@ -446,111 +435,194 @@ class _LandDetailScreenState extends State<LandDetailScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      // Arka plan gradient
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFF1F8E9), Color(0xFFFFFFFF)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         child: isUpdating
             ? const Center(child: CircularProgressIndicator())
-            : ListView(
-                children: [
-                  Text('Konum: ${land.location}'),
-                  Text('Toprak Analizi: ${land.soilAnalysis}'),
-                  Text('Bütçe: ${land.budget}'),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _selectCrop,
-                    child: Text(
-                      land.chosenCrop == null
-                          ? 'Ürün Seç/Değiştir'
-                          : 'Seçili Ürün: ${land.chosenCrop}',
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Arazi temel bilgileri kartı
+                    Card(
+                      color: Colors.white.withOpacity(0.85),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Konum: ${land.location}',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            Text(
+                              'Toprak Analizi: ${land.soilAnalysis}',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            Text(
+                              'Bütçe: ${land.budget}',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => TaskListScreen(
-                            land: land,
-                            onUpdate: (updatedLand) {
-                              setState(() {
-                                land = updatedLand;
-                              });
-                              _updateLandBackend();
-                            },
+                    const SizedBox(height: 10),
+
+                    // Butonlar (ürün seç, görevler, fotoğraf vb.)
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.agriculture),
+                          label: Text(
+                            land.chosenCrop == null
+                                ? 'Ürün Seç/Değiştir'
+                                : 'Seçili Ürün: ${land.chosenCrop}',
                           ),
+                          onPressed: _selectCrop,
                         ),
-                      );
-                    },
-                    child: const Text('Sulama/Gübreleme Görevleri'),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _takePhotoOrUpload,
-                    child: const Text('Hasat Kontrol Fotoğrafı'),
-                  ),
-                  const SizedBox(height: 10),
-                  // Yeni: Tavsiye Al butonu
-                  ElevatedButton(
-                    onPressed: _getAdvice,
-                    child: const Text('Tavsiye Al'),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Ek Bilgiler',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.list),
+                          label: const Text('Sulama/Gübreleme Görevleri'),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => TaskListScreen(
+                                  land: land,
+                                  onUpdate: (updatedLand) {
+                                    setState(() => land = updatedLand);
+                                    _updateLandBackend();
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.camera_alt),
+                          label: const Text('Hasat Kontrol Fotoğrafı'),
+                          onPressed: _takePhotoOrUpload,
+                        ),
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.cloud),
+                          label: const Text('Hava Durumu'),
+                          onPressed: _getWeather,
+                        ),
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.help_outline),
+                          label: const Text('Tavsiye Al'),
+                          onPressed: _getAdvice,
+                        ),
+                      ],
                     ),
-                  ),
-                  if (land.size != null)
-                    Text('Büyüklük: ${land.size} ${land.sizeUnit ?? ''}'),
-                  if (land.landStructure != null)
-                    Text('Arazi Yapısı: ${land.landStructure}'),
-                  if (land.soilColor != null)
-                    Text('Toprak Rengi: ${land.soilColor}'),
-                  if (land.soilComposition != null)
-                    Text('Toprak Yapısı: ${land.soilComposition}'),
-                  if (land.stoneStatus != null)
-                    Text('Taş Durumu: ${land.stoneStatus}'),
-                  if (land.waterStatus != null)
-                    Text('Su Durumu: ${land.waterStatus}'),
-                  if (land.irrigationSource != null)
-                    Text('Sulama Kaynağı: ${land.irrigationSource}'),
-                  if (land.irrigationMethod != null)
-                    Text('Sulama Yöntemi: ${land.irrigationMethod}'),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _editAdditionalDetails,
-                    child: const Text('Ek Bilgileri Düzenle'),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _showExpenseDialog,
-                          child: const Text('Gider Ekle'),
+                    const SizedBox(height: 10),
+
+                    // Ek bilgiler
+                    Card(
+                      color: Colors.white.withOpacity(0.85),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Ek Bilgiler',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            if (land.size != null)
+                              Text(
+                                  'Büyüklük: ${land.size} ${land.sizeUnit ?? ''}'),
+                            if (land.landStructure != null)
+                              Text('Arazi Yapısı: ${land.landStructure}'),
+                            if (land.soilColor != null)
+                              Text('Toprak Rengi: ${land.soilColor}'),
+                            if (land.soilComposition != null)
+                              Text('Toprak Yapısı: ${land.soilComposition}'),
+                            if (land.stoneStatus != null)
+                              Text('Taş Durumu: ${land.stoneStatus}'),
+                            if (land.waterStatus != null)
+                              Text('Su Durumu: ${land.waterStatus}'),
+                            if (land.irrigationSource != null)
+                              Text('Sulama Kaynağı: ${land.irrigationSource}'),
+                            if (land.irrigationMethod != null)
+                              Text('Sulama Yöntemi: ${land.irrigationMethod}'),
+                            const SizedBox(height: 8),
+                            ElevatedButton.icon(
+                              icon: const Icon(Icons.edit),
+                              label: const Text('Ek Bilgileri Düzenle'),
+                              onPressed: _editAdditionalDetails,
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _showIncomeDialog,
-                          child: const Text('Gelir Ekle'),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Gider / Gelir işlemleri
+                    Card(
+                      color: Colors.white.withOpacity(0.85),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                ElevatedButton.icon(
+                                  icon: const Icon(Icons.remove_circle_outline),
+                                  label: const Text('Gider Ekle'),
+                                  onPressed: _showExpenseDialog,
+                                ),
+                                ElevatedButton.icon(
+                                  icon: const Icon(Icons.add_circle_outline),
+                                  label: const Text('Gelir Ekle'),
+                                  onPressed: _showIncomeDialog,
+                                ),
+                                ElevatedButton.icon(
+                                  icon: const Icon(Icons.attach_money),
+                                  label: const Text('Kâr Marjını Göster'),
+                                  onPressed: _calculateProfitMargin,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Text('Toplam Gider: ${land.totalExpense}'),
+                            Text('Toplam Gelir: ${land.totalIncome}'),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: _calculateProfitMargin,
-                    child: const Text('Kâr Marjını Göster'),
-                  ),
-                  const SizedBox(height: 10),
-                  Text('Toplam Gider: ${land.totalExpense}'),
-                  Text('Toplam Gelir: ${land.totalIncome}'),
-                ],
+                    ),
+                  ],
+                ),
               ),
       ),
     );

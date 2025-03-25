@@ -1,42 +1,75 @@
-import unittest
-from models import User, db
-from app import create_app
+import pytest
+from src.models.arazi import Arazi
+from src.models.user import User
 
-class UserModelTestCase(unittest.TestCase):
-    def setUp(self):
-        """Test veritabanını oluştur ve kullanıcıyı ekle."""
-        self.app = create_app()
-        self.app.config['TESTING'] = True
-        self.client = self.app.test_client()
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        db.create_all()
+def test_add_land_success():
+    """Kullanıcı yeni bir arsa ekleyebilmeli"""
+    # Test kullanıcısı oluştur
+    user = User(
+        name="Land Test User",
+        email="landtest@example.com",
+        password="hashedpassword123"
+    )
+    
+    # Test arsa verisi
+    land_data = {
+        "name": "Test Arsası",
+        "location": "Ankara, Çankaya",
+        "size": 5000,  # m²
+        "coordinates": {
+            "latitude": 39.925533,
+            "longitude": 32.866287
+        }
+    }
+    
+    # Arsa nesnesi oluştur
+    land = Arazi(
+        name=land_data["name"],
+        location=land_data["location"],
+        size=land_data["size"],
+        latitude=land_data["coordinates"]["latitude"],
+        longitude=land_data["coordinates"]["longitude"],
+        owner_id=user.id
+    )
+    
+    # Assertions
+    assert land is not None
+    assert land.name == land_data["name"]
+    assert land.location == land_data["location"]
+    assert land.size == land_data["size"]
+    assert land.latitude == land_data["coordinates"]["latitude"]
+    assert land.longitude == land_data["coordinates"]["longitude"]
+    assert land.owner_id == user.id
 
-    def tearDown(self):
-        """Test veritabanını temizle."""
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
-
-    def test_user_creation(self):
-        """Kullanıcı oluşturma testi."""
-        user = User(
-            email="test@example.com",
-            password="Test1234!",  # Şifre oluşturulurken hashlenir.
-            ad="Test",
-            soyad="User",
-            telefon="1234567890"
+def test_add_land_invalid_location():
+    """Geçersiz konumla arsa eklenememeli"""
+    # Test kullanıcısı oluştur
+    user = User(
+        name="Land Test User",
+        email="landtest@example.com",
+        password="hashedpassword123"
+    )
+    
+    # Geçersiz arsa verisi
+    land_data = {
+        "name": "Geçersiz Arsa",
+        "location": "",  # Boş konum
+        "size": 5000,
+        "coordinates": {
+            "latitude": None,
+            "longitude": None
+        }
+    }
+    
+    # Arsa nesnesi oluşturmayı dene
+    with pytest.raises(ValueError) as exc_info:
+        Arazi(
+            name=land_data["name"],
+            location=land_data["location"],
+            size=land_data["size"],
+            latitude=land_data["coordinates"]["latitude"],
+            longitude=land_data["coordinates"]["longitude"],
+            owner_id=user.id
         )
-        db.session.add(user)
-        db.session.commit()
-
-        # Veritabanından kullanıcıyı al ve doğrula
-        retrieved_user = User.query.filter_by(email="test@example.com").first()
-        self.assertIsNotNone(retrieved_user)
-        self.assertEqual(retrieved_user.ad, "Test")
-        self.assertEqual(retrieved_user.soyad, "User")
-        self.assertEqual(retrieved_user.telefon, "1234567890")
-        self.assertTrue(retrieved_user.check_password("Test1234!"))  # Şifre doğrulama
-
-if __name__ == '__main__':
-    unittest.main()
+    
+    assert "Valid location is required" in str(exc_info.value)
