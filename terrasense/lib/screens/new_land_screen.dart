@@ -94,15 +94,14 @@ class _NewLandScreenState extends State<NewLandScreen> {
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(labelText: 'Toprak Analizi'),
                 value: _selectedSoilAnalysis,
-                items:
-                    ['Kireçli', 'Killi', 'Kumlu', 'Humuslu', 'Diğer'].map((
-                      soilType,
-                    ) {
-                      return DropdownMenuItem<String>(
-                        value: soilType,
-                        child: Text(soilType),
-                      );
-                    }).toList(),
+                items: ['Kireçli', 'Killi', 'Kumlu', 'Humuslu', 'Diğer'].map((
+                  soilType,
+                ) {
+                  return DropdownMenuItem<String>(
+                    value: soilType,
+                    child: Text(soilType),
+                  );
+                }).toList(),
                 onChanged: (val) {
                   setState(() {
                     _selectedSoilAnalysis = val ?? 'Kireçli';
@@ -135,13 +134,12 @@ class _NewLandScreenState extends State<NewLandScreen> {
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(labelText: 'Arazi Tipi'),
                 value: _selectedLandType,
-                items:
-                    ['Bahçe', 'Tarla', 'Sera', 'Saksı', 'Diğer'].map((type) {
-                      return DropdownMenuItem<String>(
-                        value: type,
-                        child: Text(type),
-                      );
-                    }).toList(),
+                items: ['Bahçe', 'Tarla', 'Sera', 'Saksı', 'Diğer'].map((type) {
+                  return DropdownMenuItem<String>(
+                    value: type,
+                    child: Text(type),
+                  );
+                }).toList(),
                 onChanged: (val) {
                   setState(() {
                     _selectedLandType = val ?? 'Bahçe';
@@ -171,13 +169,12 @@ class _NewLandScreenState extends State<NewLandScreen> {
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(labelText: 'Büyüklük Birimi'),
                 value: _selectedSizeUnit,
-                items:
-                    _sizeUnits.map((unit) {
-                      return DropdownMenuItem<String>(
-                        value: unit,
-                        child: Text(unit),
-                      );
-                    }).toList(),
+                items: _sizeUnits.map((unit) {
+                  return DropdownMenuItem<String>(
+                    value: unit,
+                    child: Text(unit),
+                  );
+                }).toList(),
                 onChanged: (val) {
                   setState(() {
                     _selectedSizeUnit = val;
@@ -188,13 +185,12 @@ class _NewLandScreenState extends State<NewLandScreen> {
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(labelText: 'Arazi Yapısı'),
                 value: _selectedLandStructure,
-                items:
-                    _landStructures.map((structure) {
-                      return DropdownMenuItem<String>(
-                        value: structure,
-                        child: Text(structure),
-                      );
-                    }).toList(),
+                items: _landStructures.map((structure) {
+                  return DropdownMenuItem<String>(
+                    value: structure,
+                    child: Text(structure),
+                  );
+                }).toList(),
                 onChanged: (val) {
                   setState(() {
                     _selectedLandStructure = val;
@@ -210,13 +206,12 @@ class _NewLandScreenState extends State<NewLandScreen> {
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(labelText: 'Toprak Yapısı'),
                 value: _selectedSoilComposition,
-                items:
-                    _soilCompositions.map((composition) {
-                      return DropdownMenuItem<String>(
-                        value: composition,
-                        child: Text(composition),
-                      );
-                    }).toList(),
+                items: _soilCompositions.map((composition) {
+                  return DropdownMenuItem<String>(
+                    value: composition,
+                    child: Text(composition),
+                  );
+                }).toList(),
                 onChanged: (val) {
                   setState(() {
                     _selectedSoilComposition = val;
@@ -227,13 +222,12 @@ class _NewLandScreenState extends State<NewLandScreen> {
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(labelText: 'Taş Durumu'),
                 value: _selectedStoneStatus,
-                items:
-                    _stoneStatuses.map((status) {
-                      return DropdownMenuItem<String>(
-                        value: status,
-                        child: Text(status),
-                      );
-                    }).toList(),
+                items: _stoneStatuses.map((status) {
+                  return DropdownMenuItem<String>(
+                    value: status,
+                    child: Text(status),
+                  );
+                }).toList(),
                 onChanged: (val) {
                   setState(() {
                     _selectedStoneStatus = val;
@@ -244,13 +238,12 @@ class _NewLandScreenState extends State<NewLandScreen> {
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(labelText: 'Su Durumu'),
                 value: _selectedWaterStatus,
-                items:
-                    _waterStatuses.map((status) {
-                      return DropdownMenuItem<String>(
-                        value: status,
-                        child: Text(status),
-                      );
-                    }).toList(),
+                items: _waterStatuses.map((status) {
+                  return DropdownMenuItem<String>(
+                    value: status,
+                    child: Text(status),
+                  );
+                }).toList(),
                 onChanged: (val) {
                   setState(() {
                     _selectedWaterStatus = val;
@@ -261,13 +254,12 @@ class _NewLandScreenState extends State<NewLandScreen> {
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(labelText: 'Sulama Kaynağı'),
                 value: _selectedIrrigationSource,
-                items:
-                    _irrigationSources.map((source) {
-                      return DropdownMenuItem<String>(
-                        value: source,
-                        child: Text(source),
-                      );
-                    }).toList(),
+                items: _irrigationSources.map((source) {
+                  return DropdownMenuItem<String>(
+                    value: source,
+                    child: Text(source),
+                  );
+                }).toList(),
                 onChanged: (val) {
                   setState(() {
                     _selectedIrrigationSource = val;
@@ -278,13 +270,12 @@ class _NewLandScreenState extends State<NewLandScreen> {
               DropdownButtonFormField<String>(
                 decoration: const InputDecoration(labelText: 'Sulama Yöntemi'),
                 value: _selectedIrrigationMethod,
-                items:
-                    _irrigationMethods.map((method) {
-                      return DropdownMenuItem<String>(
-                        value: method,
-                        child: Text(method),
-                      );
-                    }).toList(),
+                items: _irrigationMethods.map((method) {
+                  return DropdownMenuItem<String>(
+                    value: method,
+                    child: Text(method),
+                  );
+                }).toList(),
                 onChanged: (val) {
                   setState(() {
                     _selectedIrrigationMethod = val;
@@ -326,9 +317,9 @@ class _NewLandScreenState extends State<NewLandScreen> {
               isSubmitting
                   ? const Center(child: CircularProgressIndicator())
                   : ElevatedButton(
-                    onPressed: _submitForm,
-                    child: const Text('Kaydet'),
-                  ),
+                      onPressed: _submitForm,
+                      child: const Text('Kaydet'),
+                    ),
             ],
           ),
         ),

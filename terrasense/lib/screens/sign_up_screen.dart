@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:terra_sense/screens/welcome_screen.dart';
 import 'dart:convert'; // For encoding/decoding JSON
 import 'main_menu_screen.dart';
 
@@ -38,26 +39,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
         // Registration successful, navigate to the main menu
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const MainMenuScreen()),
+          MaterialPageRoute(builder: (_) => const WelcomeScreen()),
         );
       } else {
         // Handle error responses (e.g., show an alert)
         final responseData = json.decode(response.body);
         showDialog(
           context: context,
-          builder:
-              (context) => AlertDialog(
-                title: Text('Hata'),
-                content: Text(responseData['hata'] ?? 'Kayıt işlemi başarısız'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('Tamam'),
-                  ),
-                ],
+          builder: (context) => AlertDialog(
+            title: Text('Hata'),
+            content: Text(responseData['hata'] ?? 'Kayıt işlemi başarısız'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Tamam'),
               ),
+            ],
+          ),
         );
       }
     } catch (e) {
