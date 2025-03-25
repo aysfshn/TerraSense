@@ -3,6 +3,7 @@ from src.models import db
 from src.models.arazi import Arazi
 from src.utils.auth import token_required
 from ..utils.ai_helper import arazi_tavsiyesi_al
+from ..utils.weather_helper import hava_durumu_helper
 import json
 
 arazi_bp = Blueprint('arazi', __name__)
@@ -207,6 +208,34 @@ def arazi_tavsiyesi(arazi_id):
             'olusturulma_tarihi': tavsiye_sonucu['olusturulma_tarihi']
         })
         
+    except Exception as e:
+        return jsonify({
+            'basarili': False,
+            'mesaj': 'Arazi bilgileri alınırken bir hata oluştu',
+            'hata': str(e)
+        }), 500 
+    
+@arazi_bp.route('/hava_durumu/<int:arazi_id>', methods=['GET'])
+def hava_durumu(arazi_id):
+    """
+    Belirli bir arazi için hava durumu bilgilerini alır
+    """
+    # Araziyi veritabanından al
+    try:
+        arazi = Arazi.query.get_or_404(arazi_id)
+        
+        # Arazi verilerini sözlük formatına çevir
+        arazi_data = arazi.to_dict()
+
+        hava_durumu_sonuc = hava_durumu_helper(arazi_data)
+
+        return jsonify({
+            'basarili': True,
+            'arazi_id': arazi_id,
+            'arazi_adi': arazi.adi,
+            'hava_durumu': hava_durumu_sonuc 
+        })
+
     except Exception as e:
         return jsonify({
             'basarili': False,
