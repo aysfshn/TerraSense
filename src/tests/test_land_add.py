@@ -1,6 +1,6 @@
 import pytest
-from src.models.arazi import Arazi
-from src.models.user import User
+from ..models.arazi import Arazi
+from ..models.user import User
 
 def test_add_land_success():
     """Kullanıcı yeni bir arsa ekleyebilmeli"""
