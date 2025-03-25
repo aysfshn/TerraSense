@@ -6,7 +6,7 @@ from ..utils.ai_helper import arazi_tavsiyesi_al
 from ..utils.weather_helper import hava_durumu_helper
 import json
 
-arazi_bp = Blueprint('arazi', _name_)
+arazi_bp = Blueprint('arazi', __name__)
 
 @arazi_bp.route('/', methods=['POST'])
 @token_required
@@ -241,4 +241,4 @@ def hava_durumu(arazi_id):
             'basarili': False,
             'mesaj': 'Arazi bilgileri alınırken bir hata oluştu',
             'hata': str(e)
-        }), 500
+        }), 500 
