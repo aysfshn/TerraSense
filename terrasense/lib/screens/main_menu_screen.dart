@@ -1,13 +1,16 @@
-// main_menu_screen.dart
 import 'package:flutter/material.dart';
 import 'land_detail_screen.dart';
 import 'new_land_screen.dart';
 import '../models/land.dart';
 import 'package:terra_sense/ApiService.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'settings_screen.dart'; // Ayarlar ekranı dosyası
 
 class MainMenuScreen extends StatefulWidget {
-  const MainMenuScreen({Key? key}) : super(key: key);
+  final Function(ThemeMode) onThemeChanged; // Tema değiştirme callback'i
+
+  const MainMenuScreen({Key? key, required this.onThemeChanged})
+      : super(key: key);
 
   @override
   State<MainMenuScreen> createState() => _MainMenuScreenState();
@@ -58,7 +61,29 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Ana Menü')),
+      appBar: AppBar(
+        title: const Text('Ana Menü'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              // Ayarlar ekranına yönlendiriyoruz
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SettingsScreen(
+                    currentTheme:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? ThemeMode.dark
+                            : ThemeMode.light,
+                    onThemeChanged: widget.onThemeChanged,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : lands.isEmpty
@@ -71,21 +96,16 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                       child: ListTile(
                         title: Text(land.name),
                         subtitle: Text(
-                          'Tip: ${land.landType}',
-                        ),
+                            'Bakım yüzdesi: ${land.carePercentage.toStringAsFixed(1)}%'),
                         trailing: CircularPercentIndicator(
                           radius: 20.0,
                           lineWidth: 4.0,
-                          percent: land.carePercentage /
-                              100, // Örneğin, %10 için 0.1
+                          percent: land.carePercentage / 100,
                           center: Text(
                               "${land.carePercentage.toStringAsFixed(0)}%"),
-                          progressColor:
-                              Colors.lightBlue, // %10 olan kısmın rengi
-                          backgroundColor:
-                              Colors.blue[900]!, // Kalan %90'ın rengi
-                          circularStrokeCap: CircularStrokeCap
-                              .round, // Kenarların yuvarlak olması için
+                          progressColor: Colors.lightBlue,
+                          backgroundColor: Colors.blue[900]!,
+                          circularStrokeCap: CircularStrokeCap.round,
                         ),
                         onTap: () async {
                           final result = await Navigator.push(

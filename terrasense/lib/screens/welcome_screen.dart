@@ -3,7 +3,9 @@ import 'sign_up_screen.dart';
 import 'login_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
+  final Function(ThemeMode) onThemeChanged;
+  const WelcomeScreen({Key? key, required this.onThemeChanged})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

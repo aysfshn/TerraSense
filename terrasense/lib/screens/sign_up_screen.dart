@@ -36,7 +36,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
         // Kayıt başarılı, WelcomeScreen'e yönlendir
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+          MaterialPageRoute(
+            builder: (_) => WelcomeScreen(
+              onThemeChanged: (ThemeMode newTheme) {},
+            ),
+          ),
         );
       } else {
         // Hata durumunda uyarı

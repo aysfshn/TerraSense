@@ -37,7 +37,11 @@ class LoginScreenState extends State<LoginScreen> {
         // Ana menüye yönlendir
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const MainMenuScreen()),
+          MaterialPageRoute(
+            builder: (_) => MainMenuScreen(
+              onThemeChanged: (ThemeMode newTheme) {},
+            ),
+          ),
         );
       } else {
         // Hata mesajını göster
