@@ -10,19 +10,23 @@ if not api_key:
 
 client = OpenAI(api_key=api_key)
 
+def safe_json_loads(value):
+    if isinstance(value, str) and value.strip():
+        try:
+            return json.loads(value)
+        except Exception:
+            return []  # veya value'yı olduğu gibi bırakabilirsiniz
+    return []
+
 def arazi_tavsiyesi_al(arazi_data):
     """
     Arazi verilerini kullanarak OpenAI'dan tarım tavsiyeleri alır.
     """
     # JSON verilerini parse et
-    if isinstance(arazi_data.get('son_urunler'), str):
-        arazi_data['son_urunler'] = json.loads(arazi_data['son_urunler'])
-    if isinstance(arazi_data.get('sorunlar'), str):
-        arazi_data['sorunlar'] = json.loads(arazi_data['sorunlar'])
-    if isinstance(arazi_data.get('ekipmanlar'), str):
-        arazi_data['ekipmanlar'] = json.loads(arazi_data['ekipmanlar'])
-    if isinstance(arazi_data.get('don_durumlari'), str):
-        arazi_data['don_durumlari'] = json.loads(arazi_data['don_durumlari'])
+    arazi_data['son_urunler'] = safe_json_loads(arazi_data.get('son_urunler', ''))
+    arazi_data['sorunlar'] = safe_json_loads(arazi_data.get('sorunlar', ''))
+    arazi_data['ekipmanlar'] = safe_json_loads(arazi_data.get('ekipmanlar', ''))
+    arazi_data['don_durumlari'] = safe_json_loads(arazi_data.get('don_durumlari', ''))
 
     # Prompt oluştur
     prompt = f"""Bir çiftçi için tarım tavsiyeleri verir misin? İşte arazisi hakkında detaylı bilgiler:
@@ -64,11 +68,9 @@ Lütfen şu konularda tavsiyeler ver:
 7. Maliyet düşürme ve verim artırma önerileri
 
 Lütfen önerilerini maddeler halinde, açık ve anlaşılır bir şekilde yaz."""
-
     try:
-        # OpenAI API'sini çağır
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo", 
+            model="gpt-4o", 
             messages=[
                 {"role": "system", "content": "Sen tarım ve çiftçilik konusunda uzman bir ziraat mühendisisin. Çiftçilere pratik ve uygulanabilir tavsiyeler veriyorsun."},
                 {"role": "user", "content": prompt}
@@ -86,4 +88,4 @@ Lütfen önerilerini maddeler halinde, açık ve anlaşılır bir şekilde yaz."
         return {
             'hata': 'Tavsiye alınırken bir hata oluştu',
             'detay': str(e)
-        } 
+        }
