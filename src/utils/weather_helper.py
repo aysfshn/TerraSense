@@ -9,7 +9,7 @@ api_key = "a80e187bb02d656397186ff27c6d42ae"
 
 def hava_durumu_helper(arazi_data):
     konum = arazi_data['konum']
-    konum = konum.split(',')
+    konum = konum.split('/')
     sehir = konum[0]
 
     BASE_URL = "http://api.openweathermap.org/data/2.5/weather?"
